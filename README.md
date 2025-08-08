@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <a href="https://arxiv.org/pdf/2505.11427">
+  <a href="https://aclanthology.org/2025.acl-demo.55/">
     <img src="https://img.shields.io/badge/ACL%20Demo-2025-B31B1B.svg" alt="ACL Demo 2025"/>
   </a>
 </p>
@@ -181,14 +181,24 @@ Bug reports, feature requests and pull requests are very welcome! Please read [`
 ## 🧠 Citation
 
 ```bibtex
-@misc{minut2025mergeneticsimpleevolutionarymodel,
-      title={Mergenetic: a Simple Evolutionary Model Merging Library}, 
-      author={Adrian Robert Minut and Tommaso Mencattini and Andrea Santilli and Donato Crisostomi and Emanuele Rodolà},
-      year={2025},
-      eprint={2505.11427},
-      archivePrefix={arXiv},
-      primaryClass={cs.LG},
-      url={https://arxiv.org/abs/2505.11427}, 
+@inproceedings{minut-etal-2025-mergenetic,
+    title = "Mergenetic: a Simple Evolutionary Model Merging Library",
+    author = "Minut, Adrian Robert  and
+      Mencattini, Tommaso  and
+      Santilli, Andrea  and
+      Crisostomi, Donato  and
+      Rodol{\`a}, Emanuele",
+    editor = "Mishra, Pushkar  and
+      Muresan, Smaranda  and
+      Yu, Tao",
+    booktitle = "Proceedings of the 63rd Annual Meeting of the Association for Computational Linguistics (Volume 3: System Demonstrations)",
+    month = jul,
+    year = "2025",
+    address = "Vienna, Austria",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2025.acl-demo.55/",
+    pages = "572--582",
+    ISBN = "979-8-89176-253-4"
 }
 ```
 
