@@ -15,6 +15,6 @@ pymoo
 plotly
 git-python
 lm-eval[vllm]
-git+https://github.com/teelinsan/mergekit.git
+git+ssh://git@github.com/teelinsan/mergekit.git
 gradio
 psutil
