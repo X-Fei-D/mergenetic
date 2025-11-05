@@ -156,8 +156,12 @@ def main(config: ConfigLmEval):
     logger.info("STEP 10 completed: Searcher defined and run")
 
     searcher.test()
+    logger.info("STEP 11 completed: Testing completed")
 
-    logger.info("Search completed. Results saved to %s", results_path)
+    searcher.visualize_results()
+    logger.info("STEP 12 completed: Visualization completed")
+
+    logger.info("ALL STEPS completed. Results saved to %s", results_path)
 
 
 if __name__ == "__main__":

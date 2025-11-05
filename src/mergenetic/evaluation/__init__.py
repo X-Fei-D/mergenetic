@@ -1,2 +1,3 @@
 from .math_language import FGMathEvaluator, MCEvaluator
 from .multilingual_evaluator import MultilingualMathFGEvaluator, MultilingualMCEvaluator
+from .evaluator import BaseEvaluator, BaseMultiObjectiveEvaluator, LanguageDetector

@@ -112,15 +112,18 @@ class Searcher:
             logger.info("TEST MODE COMPLETED")
 
     def visualize_results(self) -> None:
-        """Plots metrics and phenotypes over the optimization steps from the results_df."""
+        """Plots metrics and phenotypes over the optimization steps from the results_df and saves them to files."""
         if not hasattr(self.problem, "results_df"):
             raise AttributeError(
                 "Problem does not have 'results_df' to visualize results."
             )
 
         df = self.problem.results_df
+        # Ensure the directory exists
+        self.results_path.mkdir(parents=True, exist_ok=True)
+        
         metrics = [col for col in df.columns if "objective" in col]
-        phenotypes = [col for col in df.columns if "phenotype" in col]
+        phenotypes = [col for col in df.columns if "genotype" in col]
 
         for metric in metrics:
             plt.figure(figsize=(10, 4))
@@ -129,7 +132,10 @@ class Searcher:
             plt.xlabel("Step")
             plt.ylabel(metric)
             plt.grid(True)
-            plt.show()
+            save_path = self.results_path / f"{self.run_id}_{metric}.png"
+            plt.savefig(save_path)
+            plt.close()  # Close the figure to free memory
+            logger.info(f"Saved visualization to {save_path}")
 
         for phenotype in phenotypes:
             plt.figure(figsize=(10, 4))
@@ -138,4 +144,25 @@ class Searcher:
             plt.xlabel("Step")
             plt.ylabel(phenotype)
             plt.grid(True)
-            plt.show()
+            save_path = self.results_path / f"{self.run_id}_{phenotype}.png"
+            plt.savefig(save_path)
+            plt.close()  # Close the figure to free memory
+            logger.info(f"Saved visualization to {save_path}")
+        if phenotypes:
+            plt.figure(figsize=(14, 7))
+            for phenotype in phenotypes:
+                plt.plot(df["step"], df[phenotype], marker='o', linestyle='-', label=phenotype, markersize=4)
+            
+            plt.title("Evolution of All Genotypes Over Steps")
+            plt.xlabel("Step")
+            plt.ylabel("Genotype Value")
+            plt.grid(True)
+            # Place legend outside the plot area for better readability
+            plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+            # Adjust plot to make space for the legend
+            plt.tight_layout(rect=[0, 0, 0.85, 1])
+            
+            save_path = self.results_path / f"{self.run_id}_genotypes_combined.png"
+            plt.savefig(save_path)
+            plt.close()
+            logger.info(f"Saved combined genotype visualization to {save_path}")

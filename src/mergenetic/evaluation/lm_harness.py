@@ -43,9 +43,9 @@ class LmHarnessEvaluator:
         self.task: ConfigurableTask = self.get_task(task_name)
 
         self.sample_ids = sample_ids
-
+        self.is_test = is_test  
         if sample_ids is not None and len(sample_ids) > 0:
-            if is_test:
+            if self.is_test:
                 # take all excluding sample_ids
                 ids = np.arange(len(self.task.dataset["test"]))
                 self.task.dataset["test"] = self.task.dataset["test"].select(
@@ -109,9 +109,16 @@ class LmHarnessEvaluator:
         """
         results = simple_evaluate(model, tasks=[self.task], batch_size=self.batch_size)
         # map results ids to sample ids
-        if self.sample_ids is not None:
+        if self.sample_ids is not None and not self.is_test:
+            sid_list = list(self.sample_ids)
             for sample in results["samples"][self.task_nm]:
-                sample["doc_id"] = self.sample_ids[sample["doc_id"]]
+                did = sample["doc_id"]
+                # 仅当 did 像是子集中的局部索引且不等于任何真实 doc_id 时再映射
+                if isinstance(did, (int, np.integer)) and 0 <= did < len(sid_list):
+                    sample["doc_id"] = int(sid_list[int(did)])
+                else:
+                    # 已经是全局 doc_id，保持不变
+                    sample["doc_id"] = int(did)
 
         def get_responses(results):
             answers = []
@@ -159,22 +166,32 @@ class LmHarnessEvaluator:
         )
 
         # let's filter the answers by sample_ids
+        # IMPORTANT: only filter in search mode. In test mode we may have selected the
+        # complementary split already (exclude anchors), so filtering again would drop data.
         self.data = (
             self.data[self.data["id"].isin(self.sample_ids)]
-            if self.sample_ids is not None
+            if (self.sample_ids is not None and not self.is_test)
             else self.data
         )
 
         # if the number of answers is more than len(sample_ids), then we need to filter the answers
         # by randomly picking one with the same id
 
-        if self.sample_ids is not None and len(self.data) > len(self.sample_ids):
+        if (
+            self.sample_ids is not None
+            and not self.is_test
+            and len(self.data) > len(self.sample_ids)
+        ):
             logger.info(
                 f"Number of samples in the dataset ({len(self.data)}) is greater than the number of sample ids provided ({len(self.sample_ids)})."
             )
             self.data = self.data.groupby("id").sample(n=1).reset_index(drop=True)
 
-        if (len(self.data) != len(self.sample_ids)) and self.sample_ids is not None:
+        if (
+            self.sample_ids is not None
+            and not self.is_test
+            and (len(self.data) != len(self.sample_ids))
+        ):
             logger.warning(
                 f"Number of samples in the dataset ({len(self.data)}) does not match the number of sample ids provided ({len(self.sample_ids)})."
             )

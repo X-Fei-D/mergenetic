@@ -87,6 +87,9 @@ class BaseMergingProblem(ABC, Problem):
             }
 
         self.step = 0
+        # Container for test-mode detailed outputs (e.g., lm-eval sample-level DataFrame)
+        # Will be populated by specific Problem implementations during test()
+        self.test_results_df = None
 
     def _from_array_to_genotype(self, x: np.array) -> Path:
         """Convert an array representation to a model configuration."""
@@ -232,6 +235,9 @@ class MergingProblem(BaseMergingProblem):
         self.test_df: Optional[pd.DataFrame] = test_df
 
     def get_data(self) -> pd.DataFrame:
+        # In test mode, return detailed test results if available; otherwise fallback to search results
+        if self.test_mode and self.test_results_df is not None:
+            return self.test_results_df
         return self.results_df
 
 
@@ -265,4 +271,7 @@ class MultiObjectiveMergingProblem(BaseMergingProblem):
         self.test_dataframes: Optional[Dict[str, pd.DataFrame]] = test_dataframes
 
     def get_data(self) -> Dict[str, pd.DataFrame]:
+        # In test mode, return detailed test results if available; otherwise fallback to search results
+        if self.test_mode and self.test_results_df is not None:
+            return self.test_results_df
         return self.results_df

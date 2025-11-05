@@ -159,6 +159,9 @@ class CrossLingualMathProblem(MergingProblem):
                 batch_size=self.eval_batch_size,
             )
             correctness = evaluator.evaluate(model)
+            # store detailed test results so Searcher.test() can write them
+            if self.test_mode:
+                self.test_results_df = evaluator.get_data()
 
         est_params = PerformanceEstimationParameters(
             thetas=self.conf_pe.thetas,
@@ -347,6 +350,7 @@ class MultilingualMergingProblem(MultiObjectiveMergingProblem):
         else:
             correctness_dict = {}
             tasks = self.lm_eval_tasks["search" if not self.test_mode else "test"]
+            test_dfs = {}
             for lang in self.conf_pe.sample_ids.keys():
                 evaluator = LmHarnessEvaluator(
                     task_name=tasks[lang],
@@ -358,6 +362,11 @@ class MultilingualMergingProblem(MultiObjectiveMergingProblem):
                     batch_size=self.eval_batch_size,
                 )
                 correctness_dict[lang] = evaluator.evaluate(model)
+                if self.test_mode:
+                    test_dfs[lang] = evaluator.get_data()
+            # store detailed test results per language
+            if self.test_mode:
+                self.test_results_df = test_dfs
 
         # get metrics
         acc_dict = {}
